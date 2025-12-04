@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Quiz New</title>
+</head>
+<body>
+    <h1>this is the fun quiz heh</h1>
+    <p>please press the START button to begin the quiz.</p>
+    <p id="scoreP"></p>
+    <button id="startButton" onclick="startQuiz()">START</button>
+    <p id="question"></p> <br>
+    <img id="questionImage"></img>
+    <p id="questionAnswer"></p>
+    <img id="feedbackImage"></img> <br>
+
+    <input id="answerField" placeholder="Type your answer here" type="text"></input><br><br>
+    <button id="answerButton" onclick="submitAnswer()">Submit Answer</button><br>
+    <button id="nextButton" onclick="nextQuestion()">Next Question</button>
+    <script src="script.js"></script>
+</body>
+</html> 

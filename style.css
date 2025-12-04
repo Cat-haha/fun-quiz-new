@@ -1,0 +1,14 @@
+body{
+    padding: 20px;
+    text-align:center;
+}
+
+#questionImage, #feedbackImage{
+    width: 250px;
+    margin: 0 auto;
+}
+
+#question, #questionImage, #questionAnswer, #feedbackImage, #answerField, #answerButton{
+    display:none;
+    margin: 0 auto;
+}

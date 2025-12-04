@@ -8,13 +8,15 @@
 </head>
 <body>
     <h1>this is the fun quiz heh</h1>
-    <p>please press the START button to begin the quiz.</p>
+    <p id="instructions">please press the START button to begin the quiz.</p>
     <p id="scoreP"></p>
     <button id="startButton" onclick="startQuiz()">START</button>
     <p id="question"></p> <br>
-    <img id="questionImage"></img>
-    <p id="questionAnswer"></p>
-    <img id="feedbackImage"></img> <br>
+    <div class="images">
+        <img id="questionImage"></img>
+        <p id="questionAnswer"></p>
+        <img id="feedbackImage"></img>
+    </div>
 
     <input id="answerField" placeholder="Type your answer here" type="text"></input><br><br>
     <button id="answerButton" onclick="submitAnswer()">Submit Answer</button><br>

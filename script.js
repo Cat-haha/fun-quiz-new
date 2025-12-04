@@ -66,6 +66,7 @@ let questionsArray = [
           question:
             "#9. This landmass is the largest pile of garbage in the world and is located in the Pacific Ocean",
           answer: ["great pacific garbage patch", "gpgp", "australia"],
+          image: "",
           feedbackImage:
             "https://i.postimg.cc/bwV9KNnx/image-2025-05-07-213857100.png",
         },
@@ -941,6 +942,7 @@ let questionsArray = [
         }];
 
 let startButton = document.getElementById("startButton");
+let instructions = document.getElementById("instructions");
 let started = false;
 let tellme = document.getElementById("tellme")
 let question = document.getElementById("question")
@@ -971,11 +973,12 @@ function loadQuiz(){
     if (started === true){
         startButton.style.display = "none";
         question.style.display = "block";
-        questionImage.style.display = "block";
+        questionImage.style.display = "flex";
         questionAnswer.style.display = "none";
         feedbackImage.style.display = "none";
         answerField.style.display = "block";
         answerButton.style.display = "block";
+        instructions.innerHTML = "Follow the controls. It's pretty self-explainatory..."
         question.innerHTML = questionsArray[currentQuestion].question
         questionImage.src = questionsArray[currentQuestion].image
         questionAnswer.innerHTML = questionsArray[currentQuestion].answer
@@ -1031,11 +1034,13 @@ function goToNextIndex(){
         attempts = 0
         question.innerHTML = questionsArray[currentQuestion].question
         questionImage.src = questionsArray[currentQuestion].image
+        feedbackImage.src = questionsArray[currentQuestion].feedbackImage
         questionAnswer.style.display = "none";
         scoreP.innerHTML = `Your score is: ${score}`
         correct = false
         ableToContinue = false
         ableToAnswer = true
+        answerField.value = ""
       }
     }
 }

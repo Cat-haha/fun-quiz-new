@@ -1,14 +1,33 @@
 body{
     padding: 20px;
-    text-align:center;
+    background-color:#E9CDD0;
+    text-align: center;
 }
 
-#questionImage, #feedbackImage{
-    width: 250px;
-    margin: 0 auto;
+.images{
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items: center;
+}
+
+#questionImage, #feedbackImage {
+    border: 2.5px solid black;
+    margin: 20px;
+    width:200px;
+}
+
+button{
+    border-radius: 6px; 
+    box-shadow: 1px 1px 0 #000088;
+    cursor: pointer;
+    text-shadow: 0.5px 0.5px 0 #000;
+}
+
+#answerField, #answerButton{
+    margin:0 auto;
 }
 
 #question, #questionImage, #questionAnswer, #feedbackImage, #answerField, #answerButton{
     display:none;
-    margin: 0 auto;
 }

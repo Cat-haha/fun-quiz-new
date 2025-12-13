@@ -2,9 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const sharp = require("sharp");
+
 const questions = require("./questions");
 
-const BASE_DIR = "./webp";
+const BASE_DIR = "webp";
 
 const sections = [
   { name: "warmup", end: 19 },
@@ -16,9 +17,8 @@ const sections = [
   { name: "animals", end: Infinity },
 ];
 
-function getSection(index) {
-  const questionNumber = index + 1;
-  return sections.find((s) => questionNumber <= s.end).name;
+function getSection(qNum) {
+  return sections.find((s) => qNum <= s.end).name;
 }
 
 function ensureDir(dir) {
@@ -27,40 +27,67 @@ function ensureDir(dir) {
   }
 }
 
-const downloaded = new Set();
-
-async function downloadAndConvert(url, section) {
-  if (!url || downloaded.has(url)) return;
-  downloaded.add(url);
-
-  const filename = path.basename(url).split(".")[0] + ".webp";
-  const outputDir = path.join(BASE_DIR, section);
-  const outputPath = path.join(outputDir, filename);
-
-  ensureDir(outputDir);
+async function convert(url, outputPath) {
+  if (!url) return false;
 
   try {
-    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+      timeout: 15000,
+    });
 
-    await sharp(response.data).webp({ quality: 80 }).toFile(outputPath);
+    await sharp(response.data, { animated: false })
+      .webp({ quality: 80 })
+      .toFile(outputPath);
 
-    console.log(`✔ ${section}/${filename}`);
-  } catch (err) {
-    console.error("✖ Failed:", url);
+    return true;
+  } catch {
+    return false;
   }
 }
 
 (async () => {
   ensureDir(BASE_DIR);
 
-  for (let i = 0; i < questions.length; i++) {
-    const section = getSection(i);
-    const q = questions[i];
+  const updatedQuestions = [];
 
-    await downloadAndConvert(q.image, section);
-    await downloadAndConvert(q.feedbackImage, section);
-    await downloadAndConvert(q.hintImage, section);
+  for (let i = 0; i < questions.length; i++) {
+    const qNum = i + 1;
+    const section = getSection(qNum);
+    const q = { ...questions[i] };
+
+    const sectionDir = path.join(BASE_DIR, section);
+    ensureDir(sectionDir);
+
+    async function handle(key, type) {
+      if (!q[key]) return;
+
+      const filename = `q${qNum}-${type}.webp`;
+      const outputPath = path.join(sectionDir, filename);
+
+      const success = await convert(q[key], outputPath);
+      if (success) {
+        q[key] = `${BASE_DIR}/${section}/${filename}`;
+        console.log(`✔ q${qNum} ${type}`);
+      } else {
+        console.log(`✖ q${qNum} ${type}`);
+      }
+    }
+
+    await handle("image", "image");
+    await handle("feedbackImage", "feedback");
+    await handle("hintImage", "hint");
+
+    updatedQuestions.push(q);
   }
 
-  console.log("\n✅ All images converted and organized by section.");
+  const output = `window.questionsArray = ${JSON.stringify(
+    updatedQuestions,
+    null,
+    2
+  )};`;
+
+  fs.writeFileSync("questions.local.js", output);
+
+  console.log("\n✅ questions.local.js created with local WebP paths");
 })();

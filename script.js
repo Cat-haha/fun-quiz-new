@@ -29,8 +29,6 @@ const mathSectionIndex = 20;
 let enterPressed = 0;
 let currentQuestion = 0;
 let attempts = 0;
-const userName = prompt("Please enter your name:");
-localStorage.setItem("userName", userName);
 let score = Number(localStorage.getItem("score")) || 0;
 
 function setScore(value) {

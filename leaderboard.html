@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Leaderboard</title>
+
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 60%;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+    }
+    th {
+      background-color: #ddd;
+    }
+  </style>
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+
+  <h1>Leaderboard</h1>
+
+  <button onclick="signInWithGoogle()">Sign in with Google</button>
+
+  <p>Your Name: <span id="playerNameDisplay"></span></p>
+  <p>Your Score: <span id="playerScoreDisplay"></span></p>
+
+  <button onclick="uploadToLeaderboard()">Submit Score</button>
+
+  <h2>Top Scores</h2>
+  <table id="leaderboardTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // ---- Firebase Config ----
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-oUfl6Dnl6ZjzXvwPu1nLrqzJdQghSGI",
+      authDomain: "fun-quiz-new.firebaseapp.com",
+      projectId: "fun-quiz-new",
+      storageBucket: "fun-quiz-new.firebasestorage.app",
+      messagingSenderId: "693750914800",
+      appId: "1:693750914800:web:4d0383306023f477cb6c35",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let signedInUser = null;
+    let playerName = localStorage.getItem("userName") || "";
+    let playerScore = Number(localStorage.getItem("score")) || 0;
+
+    document.getElementById("playerNameDisplay").textContent = playerName;
+    document.getElementById("playerScoreDisplay").textContent = playerScore;
+
+    // ---- Google Sign-In ----
+    function signInWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      auth.signInWithPopup(provider)
+        .then(async (result) => {
+          signedInUser = result.user;
+
+          // Save to Firestore (hidden, not displayed)
+          await db.collection("users").doc(signedInUser.uid).set({
+            name: signedInUser.displayName,
+            email: signedInUser.email,
+            lastLogin: firebase.firestore.Timestamp.now(),
+          }, { merge: true });
+
+          // Save name for leaderboard
+          playerName = signedInUser.displayName;
+          localStorage.setItem("userName", playerName);
+
+          document.getElementById("playerNameDisplay").textContent = playerName;
+
+          alert("Signed in as " + playerName);
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("Error signing in.");
+        });
+    }
+
+    // ---- Upload score to leaderboard ----
+    async function uploadToLeaderboard() {
+      if (!signedInUser) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      try {
+        await db.collection("leaderboard").add({
+          name: playerName,
+          email: signedInUser.email, // stored but NOT shown
+          score: playerScore,
+          timestamp: firebase.firestore.Timestamp.now(),
+        });
+
+        alert("Score uploaded!");
+        loadLeaderboard();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to upload score.");
+      }
+    }
+    window.uploadToLeaderboard = uploadToLeaderboard;
+
+    // ---- Load leaderboard ----
+    async function loadLeaderboard() {
+      const tbody = document.querySelector("#leaderboardTable tbody");
+      tbody.innerHTML = "";
+
+      try {
+        const snapshot = await db.collection("leaderboard")
+          .orderBy("score", "desc")
+          .limit(10)
+          .get();
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${data.name}</td><td>${data.score}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    loadLeaderboard();
+  </script>
+
+</body>
+</html>

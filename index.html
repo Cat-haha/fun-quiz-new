@@ -5,22 +5,39 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fun Quiz New</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <h1>this is the fun quiz heh</h1>
+    <button id="googleSignIn" onclick="signInWithGoogle()">Sign In With Google</button>
+    <h1 id="title">this is the fun quiz heh</h1>
+    <p id="test"></p>
     <p id="instructions">please press the START button to begin the quiz.</p>
     <p id="scoreP"></p>
     <button id="startButton" onclick="startQuiz()">START</button>
+    <button id="forwardButton" onclick="goForward()">Go Forward</button>
     <p id="question"></p> <br>
     <div class="images">
-        <img id="questionImage"></img>
+        <img id="questionImage">
         <p id="questionAnswer"></p>
-        <img id="feedbackImage"></img>
+        <img id="feedbackImage">
+        <img id="hintImage">
+    </div>
+    
+    <div id="popup">
+        <div id="popupContent">
+            <h2 id="sectionInd">You are now in the Math Section</h2>
+            <button onclick="closePopup()" id="closeButton">Close</button>
+        </div>
     </div>
 
-    <input id="answerField" placeholder="Type your answer here" type="text"></input><br><br>
+    <a href="leaderboard.html">leaderboard</a>
+
+    <input id="answerField" autocomplete="off" placeholder="Type your answer here" type="text"></input><br><br>
     <button id="answerButton" onclick="submitAnswer()">Submit Answer</button><br>
     <button id="nextButton" onclick="nextQuestion()">Next Question</button>
+    <script src="questions.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
